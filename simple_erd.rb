@@ -98,5 +98,5 @@ digraph G {
   "
 end
 
-`dot test.dot -Tpdf > test.pdf`
-`open test.pdf`
+`dot test.dot -Tpdf > #{output_filename}`
+`open #{output_filename}`
