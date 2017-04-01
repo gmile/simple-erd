@@ -1,18 +1,7 @@
-input="
-[Person]
-name,text,not null
-height,integer,not null
-weight,integer,not null
-+birth_location_id,integer,not null
+input_filename = ARGV[1]
+output_filename = ARGV[3]
 
-[Location]
-id,serial,not null
-city,text
-state,text,not null
-country,text,not null
-
-Person *--1 Location
-"
+input = IO.read(input_filename)
 
 node_template = %{
   "%{entity_name}" [label=<%{entity_contents}>]

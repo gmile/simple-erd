@@ -9,5 +9,5 @@ brew install graphviz
 ## Usage
 
 ```bash
-dot models.dot -Tpdf > models.pdf; open models.pdf
+ruby simple_erd.rb -i input.txt -o output.pdf
 ```
