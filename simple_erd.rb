@@ -6,7 +6,7 @@ output_filename = ARGV[3]
 input = IO.read(input_filename)
 
 node_template = %{
-  "%{entity_name}" [label=<%{entity_contents}>]
+"%{entity_name}" [label=<%{entity_contents}>]
 }
 
 table_template = %(
@@ -18,11 +18,13 @@ table_template = %(
 </table>
 )
 
-row_template = %Q(<tr>
+row_template = %Q(
+<tr>
   <td border="1" sides="l%{b}" align="left" port="id"><font face="PT Mono">%{column_name}&nbsp;</font></td>
   <td %{draw_bottom} align="left"><font color="#999999" face="PT Mono">%{column_type}&nbsp;</font></td>
   <td border="1" sides="r%{b}" align="left"><font color="#CCCCCC" face="PT Mono">%{null_or_not}</font></td>
-</tr>)
+</tr>
+)
 
 edge_template = %{
 %{from} -> %{to} [headlabel="%{from_n}", taillabel="%{to_n}", arrowtail=odot, arrowhead=none, style="dashed", fontname="PT Mono"]
@@ -84,7 +86,7 @@ contents =
         }
       end
     end
-  end.join("\n\n")
+  end.join("\n")
 
 File.open("test.dot", "w+") do |f|
   f.puts "
