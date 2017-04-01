@@ -1,15 +1,15 @@
 input="
 [Person]
-*name
-height
-weight
-+birth_location_id
+name,text,not null
+height,integer,not null
+weight,integer,not null
++birth_location_id,integer,not null
 
 [Location]
-*id
-city
-state
-country
+id,serial,not null
+city,text,not null
+state,text,not null
+country,text,not null
 
 Person *--1 Location
 "
@@ -28,7 +28,7 @@ template = %Q(
 )
 
 node_template = %{
-  "%entity_name" [label=<%{entity_contents}>]
+  "%{entity_name}" [label=<%{entity_contents}>]
 }
 
 table_template = %(
@@ -40,19 +40,17 @@ table_template = %(
 </table>
 )
 
-row_template = %Q(
-<tr>
+row_template = %Q(<tr>
   <td border="1" sides="l" align="left" port="id"><font face="PT Mono">%{column_name}&nbsp;</font></td>
   <td align="left"><font color="#999999" face="PT Mono">%{column_type}&nbsp;</font></td>
   <td border="1" sides="r" align="left"><font color="#CCCCCC" face="PT Mono">%{null_or_not}</font></td>
-</tr>
-)
+</tr>)
 
 contents =
   input.split("\n\n").map do |group|
     lines = group.strip.split("\n")
 
-    if lines[0].start_with("[")
+    if lines[0].start_with?("[")
       # dealing with box group
       entity_name = lines[0].scan(/\w+/)[0]
 
@@ -67,9 +65,15 @@ contents =
           }
         end.join("\n")
 
-      table_template % {
+      table =
+        table_template % {
+          entity_name: entity_name,
+          attributes: attributes
+        }
+
+      node_template % {
         entity_name: entity_name,
-        attributes: attributes
+        entity_contents: table
       }
     else
       ""
@@ -77,10 +81,12 @@ contents =
     end
   end.join("\n\n")
 
-output = "
-  digraph G {
-    #{contents}
-  }
-"
+File.open("test.dot", "w+") do |f|
+  f.puts "
+digraph G {
+  #{contents}
+}
+  "
+end
 
-puts output
+`dot test.dot -Tpdf > test.pdf`
