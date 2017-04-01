@@ -41,14 +41,16 @@ contents =
 
       attributes =
         lines[1..-1].map.with_index do |line, idx|
-          column_name, column_type, null_or_not = line.split(",")
+          match = line.match /^(?<a>.+)\s?,\s?(?<b>.+)(\s?,\s?(?<c>\w+))?$/
+
+          puts match.inspect
 
           draw_bottom = idx == n_of_attributes - 1
 
           row_template % {
-            column_name: column_name,
-            column_type: column_type,
-            null_or_not: null_or_not || "&nbsp;",
+            column_name: match[:a],
+            column_type: match[:b],
+            null_or_not: match[:c] || "&nbsp;",
             b: draw_bottom ? "b" : "",
             draw_bottom: draw_bottom ? 'border="1" sides="b"' : ""
           }
