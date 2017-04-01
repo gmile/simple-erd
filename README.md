@@ -11,3 +11,7 @@ brew install graphviz
 ```bash
 ruby simple_erd.rb -i input.txt -o output.pdf
 ```
+
+## Licence
+
+MIT
