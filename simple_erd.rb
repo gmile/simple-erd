@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 input_filename = ARGV[1]
 output_filename = ARGV[3]
 
