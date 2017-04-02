@@ -17,7 +17,7 @@ OptionParser.new do |parser|
     required_options[:output] = v
   end
 
-  parser.on("-f", "--format FMT", "Output file format.") do |v|
+  parser.on("-f", "--format FORMAT", "Output file format. See a list of available formats here: http://www.graphviz.org/doc/info/output.html") do |v|
     required_options[:output_format] = v
   end
 end.parse!
