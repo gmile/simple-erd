@@ -76,7 +76,7 @@ contents =
       n_of_attributes = lines[1..-1].size
 
       if entity_name[-1] != "s"
-        puts "Warning: '#{entity_name}' table name must be plural"
+        puts "Warning: '#{entity_name}' table name must be in plural form"
       end
 
       attributes =
@@ -85,9 +85,9 @@ contents =
 
           draw_bottom = idx == n_of_attributes - 1
 
-          # if match[:a].end_with?("_id") == "VARCHAR(36)"
-          #   puts "Warning: '#{entity_name}'.'#{match[:a].strip}' is a UUID? Consider using built-in type, UUID"
-          # end
+          if match[:a].strip.end_with?("_id") && match[:b].strip == "TEXT"
+            puts "Warning: '#{entity_name}'.'#{match[:a].strip}' seem to be a primary or secondary key. Are you sure it's type is TEXT?"
+          end
 
           if match[:b].strip == "VARCHAR(36)"
             puts "Warning: '#{entity_name}'.'#{match[:a].strip}' is a UUID? Consider using built-in type, UUID"
