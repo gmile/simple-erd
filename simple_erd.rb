@@ -27,7 +27,7 @@ row_template = %Q(
 )
 
 edge_template = %{
-%{from} -> %{to} [headlabel="%{from_n}", taillabel="%{to_n}", arrowtail=odot, arrowhead=none, style="dashed", fontname="PT Mono"]
+%{from} -> %{to} [headlabel="%{to_n}", taillabel="%{from_n}", arrowtail=odot, arrowhead=none, style="dashed", fontname="PT Mono"]
 }
 
 contents =
@@ -41,7 +41,7 @@ contents =
 
       attributes =
         lines[1..-1].map.with_index do |line, idx|
-          match = line.match /^(?<a>.+)\s?,\s?(?<b>.+)(\s?,\s?(?<c>\w+))?$/
+          match = line.match /(?<a>.*)\s?\|\s?(?<b>.*)\s?\|\s?(?<c>.*)/
 
           puts match.inspect
 
@@ -77,6 +77,7 @@ contents =
           when "1" then "1"
           when "*" then "0..n"
           when "+" then "1..n"
+          when "x" then "???"
           end
         }
 
