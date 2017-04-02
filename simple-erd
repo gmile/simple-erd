@@ -5,7 +5,7 @@ require 'optparse'
 required_options = {
   input: nil,
   output: nil,
-  output_format: nil
+  output_format: "pdf"
 }
 
 OptionParser.new do |parser|
@@ -34,9 +34,9 @@ required_options.each do |key, value|
   end
 end
 
-input_filename = options[:input]
-output_filename = options[:output]
-output_format = options[:output_format]
+input_filename = required_options[:input]
+output_filename = required_options[:output]
+output_format = required_options[:output_format]
 
 input = IO.read(input_filename)
 
@@ -75,11 +75,27 @@ contents =
 
       n_of_attributes = lines[1..-1].size
 
+      if entity_name[-1] != "s"
+        puts "Warning: '#{entity_name}' table name must be plural"
+      end
+
       attributes =
         lines[1..-1].map.with_index do |line, idx|
           match = line.match /(?<a>.[^\|]*)\s?\|?\s?(?<b>.[^\|]*)?\s?\|?\s?(?<c>.[^\|]*)?/
 
           draw_bottom = idx == n_of_attributes - 1
+
+          # if match[:a].end_with?("_id") == "VARCHAR(36)"
+          #   puts "Warning: '#{entity_name}'.'#{match[:a].strip}' is a UUID? Consider using built-in type, UUID"
+          # end
+
+          if match[:b].strip == "VARCHAR(36)"
+            puts "Warning: '#{entity_name}'.'#{match[:a].strip}' is a UUID? Consider using built-in type, UUID"
+          end
+
+          if match[:c] == "NULL"
+            puts "Warning: '#{entity_name}'.'#{match[:a].strip}' - no need to specify explitit NULL"
+          end
 
           (row_template % {
             column_name: match[:a],
