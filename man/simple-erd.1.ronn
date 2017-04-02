@@ -1,0 +1,26 @@
+simple-erd(1) -- simple ERD generator
+==================================
+
+## SYNOPSIS
+
+`simple-erd` `-i` input_path `-o` input_path
+
+## DESCRIPTION
+
+SimpleERD is a tool to generate beautif ERD diagrams based on plaintext input.
+
+## OPTIONS
+
+  * `-i` input_path:
+    Specify path to input file.
+
+  * `-o` output_path:
+    Specify path to ouput file.
+
+## AUTHORS
+
+SimpleERD is maintained by Eugene Pirogov.
+
+## REPORTING BUGS
+
+Visit <https://github.com/gmile/simple-erd/issues>.
