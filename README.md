@@ -17,13 +17,13 @@ There are two installation options on macOS:
 
 * via [`rubygems`](https://rubygems.org):
 
-  * make sure to have `graphviz` installed:
+  1. make sure to have `graphviz` installed:
 
     ```bash
     brew install graphviz
     ```
 
-  * intall the gem:
+  2. intall the gem:
 
     ```bash
     gem install simple-erd
