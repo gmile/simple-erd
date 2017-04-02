@@ -1,11 +1,13 @@
 [Person]
-*name | type | modification
-height | type | modification
-weight | type | modification
-+birth_location_id | type | modification
+*name
+height
+weight
++birth_location_id
 
 [Location]
-*id | type | modification
-city | type | modification
-state | type | modification
-country | type | modification
+*id
+city
+state
+country
+
+Person 1--1 Location
