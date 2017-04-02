@@ -1,4 +1,4 @@
-# Simple ERD
+# SimpleERD
 
 SimpleERD is a tool to generate beautiful ERD digrams from plain text.
 
