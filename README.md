@@ -11,8 +11,8 @@ There are two installation options on macOS:
 * via [`homebrew`](https://brew.sh):
 
   ```bash
-  brew tap gmile/apps
-  brew install simple-erd
+  $ brew tap gmile/apps
+  $ brew install simple-erd
   ```
 
 * via [`rubygems`](https://rubygems.org):
@@ -20,20 +20,28 @@ There are two installation options on macOS:
   1. make sure to have `graphviz` installed:
 
       ```bash
-      brew install graphviz
+      $ brew install graphviz
       ```
 
   2. intall the gem:
 
       ```bash
-      gem install simple-erd
+      $ gem install simple-erd
       ```
 
 ## Usage
 
 ```bash
-simple_erd -i input.txt -o output.pdf
+$ simple_erd -i input.txt -o output.pdf
 ```
+
+## Examples
+
+```bash
+$ simple-erd -i samples/complex_input.txt -o /tmp/output.pdf
+```
+
+See [/samples](/samples) for more samples.
 
 ## Motivation
 
