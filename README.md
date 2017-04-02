@@ -19,15 +19,15 @@ There are two installation options on macOS:
 
   1. make sure to have `graphviz` installed:
 
-    ```bash
-    brew install graphviz
-    ```
+      ```bash
+      brew install graphviz
+      ```
 
   2. intall the gem:
 
-    ```bash
-    gem install simple-erd
-    ```
+      ```bash
+      gem install simple-erd
+      ```
 
 ## Usage
 
