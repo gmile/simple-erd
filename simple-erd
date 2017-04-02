@@ -1,7 +1,42 @@
 #!/usr/bin/env ruby
 
-input_filename = ARGV[1]
-output_filename = ARGV[3]
+require 'optparse'
+
+required_options = {
+  input: nil,
+  output: nil,
+  output_format: nil
+}
+
+OptionParser.new do |parser|
+  parser.on("-i", "--input PATH", "A path to the input file.") do |v|
+    required_options[:input] = v
+  end
+
+  parser.on("-o", "--output PATH", "A path to the output file.") do |v|
+    required_options[:output] = v
+  end
+
+  parser.on("-f", "--format FMT", "Output file format.") do |v|
+    required_options[:output_format] = v
+  end
+end.parse!
+
+required_options.each do |key, value|
+  if required_options[key].nil?
+    puts "Please, specify '#{key}' parameter."
+    puts ""
+    puts "For further help, run:"
+    puts ""
+    puts "  simple-erd --help"
+
+    exit(1)
+  end
+end
+
+input_filename = options[:input]
+output_filename = options[:output]
+output_format = options[:output_format]
 
 input = IO.read(input_filename)
 
@@ -119,5 +154,5 @@ digraph G {
   "
 end
 
-`dot test.dot -Tpdf > #{output_filename}`
+`dot test.dot -T#{output_format} > #{output_filename}`
 `open #{output_filename}`
