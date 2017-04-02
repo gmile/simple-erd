@@ -1,0 +1,202 @@
+[legal_entity]
+id | VARCHAR(36) | NOT NULL
+name | TEXT | NOT NULL
+short_name | TEXT | NULL
+type | ENUM('msp', 'mis', 'drug_store') | NOT NULL
+edrpou | TEXT | NOT NULL
+addresses[] | JSON | NULL
+phones[] | JSON | NULL
+emails[] | JSON | NULL
+created_at | DATETIME | NOT NULL
+created_by | TEXT | NOT NULL
+updated_at | DATETIME | NULL
+updated_by | TEXT | NULL
+active | TINYINT | NOT NULL
+public_name | VARCHAR(45) | NULL
+kved | JSON | NOT NULL
+founders[] | JSON | NOT NULL
+status | ENUM('new', 'verified') | NOT NULL
+owner_property_type | ENUM('state', 'private') | NOT NULL
+legal_form | ENUM('ТОВ', 'ФОП') | NOT NULL 
+
+[doctor]
+id | VARCHAR(36) | NOT NULL
+education[] | JSON | NOT NULL
+qualification[] | JSON | NULL 
+speciality[] | ENUM('терапевт', 'педіатр', 'сімейний лікар') | NOT NULL
+professional_level | JSON | NOT NULL 
+science_degree | JSON | NULL 
+academic_degree | JSON | NULL 
+specialization | TEXT | NULL
+
+[party]
+id | VARCHAR(36) | NOT NULL
+last_name | TEXT | NOT NULL
+first_name | TEXT | NOT NULL
+second_name | TEXT | NULL
+birth_date | DATE | NOT NULL
+gender | ENUM('GENDER') | NOT NULL
+tax_id | TEXT | NULL
+national_id | TEXT | NULL
+documents | JSON | NULL
+phones | JSON | NULL
+created_at | DATETIME | NOT NULL
+created_by | TEXT | NOT NULL
+updated_at | DATETIME | NOT NULL
+updated_by | TEXT | NOT NULL
+
+[division]
+id | VARCHAR(36) | NOT NULL
+msp_id | TEXT | NOT NULL
+name | VARCHAR(45) | NOT NULL
+address | JSON | NOT NULL
+external_id | TEXT | NULL
+phones[] | JSON | NULL
+email | JSON | NULL
+
+[employee]
+id | VARCHAR(36) | NOT NULL
+legal_entity_id | TEXT | NOT NULL
+position | TEXT | NOT NULL 
+start_date | DATETIME | NOT NULL
+end_date | DATETIME | NULL
+active | TINYINT | NOT NULL
+created_at | TIMESTAMP | NOT NULL
+updated_at | TIMESTAMP | NOT NULL
+created_by | TEXT | NOT NULL
+updated_by | TEXT | NOT NULL
+status | ENUM('') | NOT NULL
+employee_type | ENUM('doctor', 'hr', 'owner', 'accountant') | NOT NULL
+party_id | TEXT | NOT NULL
+division_id | VARCHAR(45) | NOT NULL
+
+[declaration_signed]
+id | VARCHAR(36) | NOT NULL
+document_type | ENUM('declaration', 'msp_registration') | NOT NULL
+document | TEXT | NOT NULL
+content | TEXT | NOT NULL
+public_key | TEXT | NOT NULL
+
+[msp]
+id | VARCHAR(36) | NOT NULL
+mountain_group | ENUM('') | NOT NULL
+accreditation[] | JSON | NOT NULL
+license[] | JSON | NOT NULL
+
+[capitation_contract]
+id | VARCHAR(36) | NOT NULL
+msp_id | TEXT | NOT NULL
+product_id | TEXT | NOT NULL
+start_date | DATETIME | NOT NULL
+end_date | DATETIME | NULL
+status | ENUM('') | NOT NULL
+signed_at | DATETIME | NULL
+services[] | JSON | NULL
+
+[product]
+id | VARCHAR(36) | NOT NULL
+name | TEXT | NOT NULL
+parameters[] | JSON | NOT NULL
+
+[employee_doctor]
+id | VARCHAR(36) NOT | NULL
+education[] | JSON | NOT NULL
+qualification[] | JSON | NULL
+speciality[] | ENUM('терапевт', 'педіатр', 'сімейний лікар') | NOT NULL
+professional_level | JSON | NOT NULL 
+science_degree | JSON | NULL 
+academic_degree | JSON | NULL 
+specialization | TEXT | NULL
+working_hours | TEXT | NULL
+
+[declaration]
+id | VARCHAR(36) | NOT NULL
+patient_id | TEXT | NOT NULL
+start_date | DATETIME | NOT NULL
+end_date | DATETIME | NOT NULL
+legal_entity_id | TEXT | NOT NULL
+status | ENUM('') | NOT NULL
+signed_at | DATETIME | NULL
+created_at | DATETIME | NOT NULL
+created_by | TEXT | NOT NULL
+updated_at | DATETIME | NOT NULL
+updated_by | TEXT | NOT NULL
+active | TINYINT | NULL
+scope | ENUM('') | NULL
+employee_id | TEXT | NOT NULL
+declaration_signed_id | INT | NOT NULL
+
+[declaration_request]
+id | VARCHAR(36) | NOT NULL
+f1 | VARCHAR(45) | NULL
+f2 | VARCHAR(45) | NULL
+
+[log_changes]
+id | VARCHAR(36) | NOT NULL
+user_id | VARCHAR(45) | NOT NULL
+resource | TEXT | NOT NULL
+what_changed | JSON | NOT NULL
+TS | TIMESTAMP | NOT NULL
+
+[legal_entity_requests]
+id | INT | NOT NULL
+legal_entity_data | VARCHAR(45) | NULL
+
+[users]
+id | VARCHAR(36) | NOT NULL
+email | TEXT | NOT NULL
+user_name | VARCHAR(45) | NOT NULL
+inserted_at | DATETIME | NOT NULL
+inserted_by | TEXT | NOT NULL
+updated_at | DATETIME | NOT NULL
+updated_by | TEXT | NOT NULL
+status | ENUM('') | NOT NULL
+credentials | JSON | NOT NULL
+party_id | VARCHAR(26) | NULL
+scopes[] | TEXT | NOT NULL
+
+[registration_requests]
+id | VARCHAR(36) | NOT NULL
+msp_id | VARCHAR(45) | NULL
+creator_id | VARCHAR(45) | NOT NULL
+data | JSON | NOT NULL
+email | TEXT | NOT NULL
+creator_signature | TEXT | NOT NULL
+status | ENUM('') | NOT NULL
+verification_id | VARCHAR(45) | NOT NULL
+
+(PRM)
+party
+doctor
+division
+msp
+employee
+legal_entity
+capitation_contract
+product
+employee_doctor
+
+(Auth)
+users
+registration_requests
+
+(OPS_DB)
+declaration
+declaration_request
+
+(Media Storage)
+declaration_signed
+
+party 1--? doctor
+party 1--+ employee
+employee *--1 division
+employee *--1 legal_entity
+division +--1 legal_entity
+msp +--1 legal_entity
+product x--1 legal_entity
+capitation_contract *--1 product
+capitation_contract 1--x product
+employee 1--? employee_doctor
+employee 1--* declaration
+declaration ?--1 declaration_signed
+party ?--+ users
