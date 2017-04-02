@@ -10,7 +10,7 @@ node_template = %{
 }
 
 table_template = %(
-<table border="0" cellborder="0" cellspacing="0">
+<table border="0" cellborder="0" cellspacing="0" bgcolor="#FFFFFF">
   <tr>
     <td colspan="3" border="1" bgcolor="#EEEEEE" cellpadding="0"><font face="PT Mono"><b>%{entity_name}</b></font></td>
   </tr>
@@ -26,15 +26,16 @@ row_template = %Q(
 </tr>
 )
 
-edge_template = %{
-%{from} -> %{to} [headlabel="%{to_n}", taillabel="%{from_n}", arrowtail=odot, arrowhead=none, style="dashed", fontname="PT Mono"]
-}
+edge_template = %{%{from} -> %{to} [headlabel="%{to_n}", taillabel="%{from_n}", arrowtail=odot, arrowhead=none, style="%{line_type}", fontname="PT Mono"]}
+
+@cluster_n = 0
 
 contents =
   input.split("\n\n").map do |group|
     lines = group.strip.split("\n")
 
-    if lines[0].start_with?("[")
+    case
+    when lines[0].start_with?("[")
       entity_name = lines[0].scan(/\w+/)[0]
 
       n_of_attributes = lines[1..-1].size
@@ -43,17 +44,15 @@ contents =
         lines[1..-1].map.with_index do |line, idx|
           match = line.match /(?<a>.*)\s?\|\s?(?<b>.*)\s?\|\s?(?<c>.*)/
 
-          puts match.inspect
-
           draw_bottom = idx == n_of_attributes - 1
 
-          row_template % {
+          (row_template % {
             column_name: match[:a],
             column_type: match[:b],
             null_or_not: match[:c] || "&nbsp;",
             b: draw_bottom ? "b" : "",
             draw_bottom: draw_bottom ? 'border="1" sides="b"' : ""
-          }
+          }).strip
         end.join("\n")
 
       table =
@@ -65,6 +64,22 @@ contents =
       node_template % {
         entity_name: entity_name,
         entity_contents: table
+      }
+    when lines[0].start_with?("(")
+      cluster_name = lines[0].match(/\((.*)\)/)[1]
+
+      @cluster_n += 1
+
+      %Q{
+        subgraph cluster_#{@cluster_n} {
+          label = "#{cluster_name}";
+          labeljust = "l";
+          style=filled;
+          fontname = "PT Mono";
+          color="#f0f1fe";
+
+          #{lines[1..-1].join(",")};
+        }
       }
     else
       lines.map do |line|
@@ -81,7 +96,10 @@ contents =
           end
         }
 
+        line_type = "dashed"
+
         edge_template % {
+          line_type: line_type,
           from: from,
           from_n: t.(from_n),
           to: to,
