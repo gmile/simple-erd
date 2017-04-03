@@ -87,14 +87,14 @@ contents =
 
           if !(match[:a].strip.match? /^\w+$/)
             if match[:a].strip.end_with?("[]")
-              puts "Warning: '#{entity_name}'.'#{match[:a]}' ends with '[]'. Instead, if you'd like to indicate that a field conatins an array, append '[]' to the type, e.g.: #{match[:b].strip}[]"
+              puts "Warning: '#{entity_name}'.'#{match[:a]}' ends with '[]'. If it meant to indicate an array, consider making the attribute name plural and appending '[]' to the type, e.g.: #{match[:b].strip}[]"
             else
               puts "Warning: '#{entity_name}'.'#{match[:a]}' contains characters, other than A-Za-z_. Please, rename the attribute to only contain only A-Za-z_."
             end
           end
 
           if match[:a].strip.end_with?("_id") && match[:b].strip == "TEXT"
-            puts "Warning: '#{entity_name}'.'#{match[:a].strip}' seem to be a primary or secondary key. Are you sure it's type is TEXT?"
+            puts "Warning: '#{entity_name}'.'#{match[:a].strip}' looks like a secondary key. Should its type be 'integer' or 'UUID'?"
           end
 
           if match[:b].strip == "VARCHAR(36)"
