@@ -12,7 +12,7 @@ There are two installation options on macOS:
 
   ```bash
   $ brew tap gmile/apps
-  $ brew install simple-erd
+  $ brew install simple-erd --HEAD
   ```
 
 * via [`rubygems`](https://rubygems.org):
