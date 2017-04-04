@@ -31,9 +31,30 @@ There are two installation options on macOS:
 
 ## Usage
 
-```bash
-$ simple_erd -i input.txt -o output.pdf
+SimpleERD requires a text file as an input. Such file must contained a text, formatted the a special way:
+
 ```
+[entity_1]
+attribute, type
+
+[entity_2]
+attribute, type, modifier
+
+[entity_3]
+attribute
+
+(entity_group_1)
+entity_1
+entity_2
+
+(entity_group_2)
+entity_3
+
+entity_1 ?--1 entity_2
+entity_3 *--n entity_2
+```
+
+Here, `[entity_1]` starts a block, indicating an entity. Right below `[entity_1]` come entity attributes. An entity
 
 ## Examples
 
