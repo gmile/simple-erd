@@ -31,7 +31,7 @@ There are two installation options on macOS:
 
 ## Usage
 
-SimpleERD requires a text file as an input. Such file must contained a text, formatted the a special way:
+SimpleERD requires a text file as an input. Input file contains text formatted the following way:
 
 ```
 [entity_1]
