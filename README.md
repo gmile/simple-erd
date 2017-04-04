@@ -35,10 +35,10 @@ SimpleERD requires a text file as an input. Such file must contained a text, for
 
 ```
 [entity_1]
-attribute, type
+attribute | type
 
 [entity_2]
-attribute, type, modifier
+attribute | type | modifier
 
 [entity_3]
 attribute
@@ -54,7 +54,15 @@ entity_1 ?--1 entity_2
 entity_3 *--n entity_2
 ```
 
-Here, `[entity_1]` starts a block, indicating an entity. Right below `[entity_1]` come entity attributes. An entity
+Here, `[entity_1]` starts a block, indicating an entity. Right below `[entity_1]` come entity attributes. An entity attribute is defined by a `attribute_name`, `type` (optional and `modifier` (optional).
+
+At the bottom of input file – relations between entities. Syntax for relations:
+
+* `?` – 0 or 1
+* `1` – exactly 1
+* `*` – 0 or more
+* `+` – 1 or more
+* `x` – relation is undefined, will render as `???` in the output.
 
 ## Examples
 
