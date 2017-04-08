@@ -20,29 +20,23 @@ result =
   table_description
     .split("\n")
     .map { |line| line.split("\t") }
-    .group_by { |line| line[0] }
-    .reduce({}) { |acc, (table, lines)|
-      acc[table] = []
+    .reduce({}) { |acc, line|
+      tbl_name,
+      col_name,
+      col_type,
+      col_is_nullable,
+      col_comment,
+      col_refs_table = line
 
-      lines.each do |line|
-        puts line.inspect
-
-        tbl_name,
-        col_name,
-        col_type,
-        col_is_nullable,
-        col_comment,
-        col_refs_table = line
-
-        acc[table] << {
-          tbl_name:           tbl_name,
-          col_name:           col_name,
-          col_type:           col_type,
-          col_is_nullable:    col_is_nullable == "NO" ? false : true,
-          col_column_comment: col_comment.empty? ? nil : col_comment,
-          col_refs_table:     col_refs_table == "NULL" ? nil : col_refs_table
-        }
-      end
+      acc[tbl_name] ||= []
+      acc[tbl_name] << {
+        tbl_name:           tbl_name,
+        col_name:           col_name,
+        col_type:           col_type,
+        col_is_nullable:    col_is_nullable == "NO" ? false : true,
+        col_column_comment: col_comment.empty? ? nil : col_comment,
+        col_refs_table:     col_refs_table == "NULL" ? nil : col_refs_table
+      }
 
       acc
     }
