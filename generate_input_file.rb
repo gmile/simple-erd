@@ -1,5 +1,7 @@
 require 'json'
 
+DB_NAME = "mydb"
+
 table_list_sql = "SHOW TABLES;"
 
 table_description_sql = %{
@@ -10,7 +12,7 @@ table_description_sql = %{
          IS_NULLABLE,
          COLUMN_COMMENT
     FROM INFORMATION_SCHEMA.COLUMNS
-   WHERE TABLE_SCHEMA = 'mydb'
+   WHERE TABLE_SCHEMA = '%{db_name}'
      AND TABLE_NAME = '%{table_name}';
 }
 
@@ -19,7 +21,7 @@ table_references_sql = %{
          COLUMN_NAME,
          REFERENCED_TABLE_NAME
     FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-   WHERE REFERENCED_TABLE_SCHEMA = 'mydb'
+   WHERE REFERENCED_TABLE_SCHEMA = '%{db_name}'
      AND TABLE_NAME = '%{table_name}';
 }
 
@@ -27,8 +29,8 @@ list_of_tables = `mysql --silent -uroot mydb -e "#{table_list_sql}"`
 
 result =
   list_of_tables.split("\n").reduce({}) do |acc, table|
-    sql = table_description_sql % {table_name: table}
-    sql2 = table_references_sql % {table_name: table}
+    sql = table_description_sql % {table_name: table, db_name: DB_NAME}
+    sql2 = table_references_sql % {table_name: table, db_name: DB_NAME}
 
     acc[table] = {
       columns: [],
@@ -36,11 +38,7 @@ result =
     }
 
     result1 = `mysql --silent -uroot mydb -e "#{sql}"`
-
-    puts result1.inspect
     result2 = `mysql --silent -uroot mydb -e "#{sql2}"`
-
-    puts result2.inspect
 
     result1.split("\n").each do |line|
       key,
@@ -111,7 +109,5 @@ end
 File.open("/tmp/output.txt", "w+") do |file|
   file.puts output
 end
-
-puts JSON.pretty_generate(result)
 
 `./simple-erd -i /tmp/output.txt -o /tmp/yo.png -f png`
