@@ -40,8 +40,6 @@ result =
       acc
     }
 
-puts result
-
 refs = []
 
 output =
@@ -67,12 +65,22 @@ output <<
     right = ref[:col_is_nullable] ? "?" : "1"
 
     "#{ref[:tbl_name]} #{left}--#{right} #{ref[:col_refs_table]}"
-  end.join("\n")
+  end
 
-puts output
+version_number = Dir.glob("/tmp/output_*").count + 1
 
-File.open("/tmp/output.txt", "w+") do |file|
+output_filename = "/tmp/output_#{version_number}.txt"
+output_diagram = "/tmp/diagram_output_#{version_number}.png"
+
+File.open(output_filename, "w+") do |file|
   file.puts output
 end
 
-`./simple-erd -i /tmp/output.txt -o /tmp/yo.png -f png`
+string = "
+Generated:
+  - #{output_filename}
+  - #{output_diagram}"
+
+puts string
+
+`./simple-erd -i #{output_filename} -o #{output_diagram} -f png`
