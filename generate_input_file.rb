@@ -19,14 +19,13 @@ table_description = `mysql --silent -uroot #{DB_NAME} -e "#{table_description_sq
 result =
   table_description
     .split("\n")
-    .map { |line| line.split("\t") }
     .reduce({}) { |acc, line|
       tbl_name,
       col_name,
       col_type,
       col_is_nullable,
       col_comment,
-      col_refs_table = line
+      col_refs_table = line.split("\t")
 
       acc[tbl_name] ||= []
       acc[tbl_name] << {
@@ -43,31 +42,32 @@ result =
 
 puts result
 
-output = ""
 refs = []
 
-result.each do |tbl_name, tbl_info|
-  output << "[#{tbl_name}]\n"
+output =
+  result.map do |tbl_name, tbl_info|
+    out = []
 
-  tbl_info.each do |col|
-    nullable = col[:col_is_nullable] ? nil : "NOT NULL"
+    out << "[#{tbl_name}]"
+    out << tbl_info.map do |col|
+      nullable = col[:col_is_nullable] ? nil : "NOT NULL"
 
-    output << [col[:col_name], col[:col_type], nullable].compact.join(" | ") << "\n"
+      if col[:col_refs_table]
+        refs << col.select { |k| [:tbl_name, :col_name, :col_is_nullable, :col_refs_table].include?(k) }
+      end
 
-    if col[:col_refs_table]
-      refs << col.select { |k| [:tbl_name, :col_name, :col_is_nullable, :col_refs_table].include?(k) }
+      [col[:col_name], col[:col_type], nullable].compact.join(" | ")
     end
+    out << ""
   end
 
-  output << "\n"
-end
+output <<
+  refs.map do |ref|
+    left  = "1"
+    right = ref[:col_is_nullable] ? "?" : "1"
 
-refs.each do |ref|
-  left  = "1"
-  right = ref[:col_is_nullable] ? "?" : "1"
-
-  output << "#{ref[:tbl_name]} #{left}--#{right} #{ref[:col_refs_table]}\n"
-end
+    "#{ref[:tbl_name]} #{left}--#{right} #{ref[:col_refs_table]}"
+  end.join("\n")
 
 puts output
 
