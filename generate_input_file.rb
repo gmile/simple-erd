@@ -71,6 +71,12 @@ version_number = Dir.glob("/tmp/output_*").count + 1
 
 output_filename = "/tmp/output_#{version_number}.txt"
 output_diagram = "/tmp/diagram_output_#{version_number}.png"
+output_json = "/tmp/json_output_#{version_number}.json"
+
+require "json"
+File.open(output_json, "w+") do |file|
+  file.puts JSON.pretty_generate(result)
+end
 
 File.open(output_filename, "w+") do |file|
   file.puts output
@@ -79,7 +85,8 @@ end
 string = "
 Generated:
   - #{output_filename}
-  - #{output_diagram}"
+  - #{output_diagram}
+  - #{output_json}"
 
 puts string
 
