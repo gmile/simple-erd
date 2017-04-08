@@ -1,110 +1,81 @@
-require 'json'
-
 DB_NAME = "mydb"
 
-table_list_sql = "SHOW TABLES;"
-
 table_description_sql = %{
-  SELECT COLUMN_KEY,
-         COLUMN_NAME,
-         COLUMN_TYPE,
-         COLUMN_DEFAULT,
-         IS_NULLABLE,
-         COLUMN_COMMENT
-    FROM INFORMATION_SCHEMA.COLUMNS
-   WHERE TABLE_SCHEMA = '%{db_name}'
-     AND TABLE_NAME = '%{table_name}';
+   SELECT C.TABLE_NAME,
+          C.COLUMN_NAME,
+          C.COLUMN_TYPE,
+          C.IS_NULLABLE,
+          C.COLUMN_COMMENT,
+          KCU.REFERENCED_TABLE_NAME
+     FROM INFORMATION_SCHEMA.COLUMNS C
+LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE KCU
+          ON KCU.COLUMN_NAME = C.COLUMN_NAME AND
+             KCU.TABLE_NAME = C.TABLE_NAME
+    WHERE C.TABLE_SCHEMA = '%{db_name}';
 }
 
-table_references_sql = %{
-  SELECT TABLE_NAME,
-         COLUMN_NAME,
-         REFERENCED_TABLE_NAME
-    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-   WHERE REFERENCED_TABLE_SCHEMA = '%{db_name}'
-     AND TABLE_NAME = '%{table_name}';
-}
-
-list_of_tables = `mysql --silent -uroot mydb -e "#{table_list_sql}"`
+table_description = `mysql --silent -uroot #{DB_NAME} -e "#{table_description_sql % {db_name: DB_NAME}}"`
 
 result =
-  list_of_tables.split("\n").reduce({}) do |acc, table|
-    sql = table_description_sql % {table_name: table, db_name: DB_NAME}
-    sql2 = table_references_sql % {table_name: table, db_name: DB_NAME}
+  table_description
+    .split("\n")
+    .map { |line| line.split("\t") }
+    .group_by { |line| line[0] }
+    .reduce({}) { |acc, (table, lines)|
+      acc[table] = []
 
-    acc[table] = {
-      columns: [],
-      references: []
+      lines.each do |line|
+        puts line.inspect
+
+        tbl_name,
+        col_name,
+        col_type,
+        col_is_nullable,
+        col_comment,
+        col_refs_table = line
+
+        acc[table] << {
+          tbl_name:           tbl_name,
+          col_name:           col_name,
+          col_type:           col_type,
+          col_is_nullable:    col_is_nullable == "NO" ? false : true,
+          col_column_comment: col_comment.empty? ? nil : col_comment,
+          col_refs_table:     col_refs_table == "NULL" ? nil : col_refs_table
+        }
+      end
+
+      acc
     }
 
-    result1 = `mysql --silent -uroot mydb -e "#{sql}"`
-    result2 = `mysql --silent -uroot mydb -e "#{sql2}"`
-
-    result1.split("\n").each do |line|
-      key,
-      name,
-      type,
-      default,
-      is_nullable,
-      column_comment = line.split("\t")
-
-      acc[table][:columns] << {
-        key:            key,
-        name:           name,
-        type:           type,
-        default:        default,
-        is_nullable:    is_nullable,
-        column_comment: column_comment
-      }
-    end
-
-    result2.split("\n").each do |line|
-      table_name,
-      column_name,
-      ref_table_name = line.split("\t")
-
-      acc[table][:references] << {
-        table_name:     table_name,
-        column_name:    column_name,
-        ref_table_name: ref_table_name
-      }
-    end
-
-    acc
-  end
+puts result
 
 output = ""
+refs = []
 
 result.each do |tbl_name, tbl_info|
   output << "[#{tbl_name}]\n"
 
-  tbl_info[:columns].each do |col|
-    nullable = col[:is_nullable] == "NO" ? "NOT NULL" : nil
+  tbl_info.each do |col|
+    nullable = col[:col_is_nullable] ? nil : "NOT NULL"
 
-    output << [col[:name], col[:type], nullable].compact.join(" | ") << "\n"
-  end
+    output << [col[:col_name], col[:col_type], nullable].compact.join(" | ") << "\n"
 
-  if tbl_info[:references].size > 0
-    output << "\n"
-
-    tbl_info[:references].each do |ref|
-      this_col = tbl_info[:columns].find { |c| c[:name] == ref[:column_name] }
-
-      right =
-        if this_col[:is_nullable] == "NO"
-          "1"
-        else
-          "?"
-        end
-
-      left = "1"
-
-      output << "#{ref[:table_name]} #{left}--#{right} #{ref[:ref_table_name]}\n"
+    if col[:col_refs_table]
+      refs << col.select { |k| [:tbl_name, :col_name, :col_is_nullable, :col_refs_table].include?(k) }
     end
   end
 
   output << "\n"
 end
+
+refs.each do |ref|
+  left  = "1"
+  right = ref[:col_is_nullable] ? "?" : "1"
+
+  output << "#{ref[:tbl_name]} #{left}--#{right} #{ref[:col_refs_table]}\n"
+end
+
+puts output
 
 File.open("/tmp/output.txt", "w+") do |file|
   file.puts output
